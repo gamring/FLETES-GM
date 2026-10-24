@@ -1,1 +1,95 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>FLETES GM - Control de Caja</title>
+  
+  <!-- Configuración PWA / iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="FLETES GM">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/m_rounded/512/FFFFFF/garage.png">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .pb-safe {
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+    .pt-safe {
+      padding-top: env(safe-area-inset-top, 20px);
+    }
+  </style>
+</head>
+<body class="h-full text-slate-100 font-sans antialiased flex flex-col justify-between">
 
+  <!-- Header iOS Style -->
+  <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 pt-safe">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+          🚛
+        </div>
+        <div>
+          <h1 class="text-base font-bold leading-none">FLETES GM</h1>
+          <p class="text-xs text-slate-400 mt-0.5">Control de Flujo de Caja</p>
+        </div>
+      </div>
+      <button onclick="toggleModal('modalScriptable')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-xs font-semibold rounded-full border border-slate-700 text-indigo-400 transition">
+        Widget iOS
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Scrollable -->
+  <main class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+    
+    <!-- Tarjetas de KPIs Principales -->
+    <div class="grid grid-cols-2 gap-3">
+      <!-- Saldo Neto -->
+      <div class="col-span-2 bg-gradient-to-br from-slate-900 to-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Saldo Neto en Caja</span>
+        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="kpiSaldoNeto">$0</div>
+        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80 text-xs">
+          <span class="text-slate-400">Ingresos: <strong class="text-slate-200" id="kpiIngresos">$0</strong></span>
+          <span class="text-slate-400">Egresos: <strong class="text-slate-200" id="kpiEgresos">$0</strong></span>
+        </div>
+      </div>
+
+      <!-- Costo por KM -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md">
+        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Costo / km (CPK)</span>
+        <div class="text-xl font-bold text-sky-400 mt-0.5" id="kpiCpk">$0</div>
+        <span class="text-[10px] text-slate-500 mt-1 block">Promedio de operación</span>
+      </div>
+
+      <!-- Rendimiento -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md">
+        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Rendimiento</span>
+        <div class="text-xl font-bold text-indigo-400 mt-0.5" id="kpiRendimiento">0 km/L</div>
+        <span class="text-[10px] text-slate-500 mt-1 block">Eficiencia combustible</span>
+      </div>
+    </div>
+
+    <!-- Gráfico de Comparación -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
+      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Distribución Egresos vs Ingresos</h2>
+      <div class="h-48 relative">
+        <canvas id="chartFlujo"></canvas>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas -->
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="toggleModal('modalNuevoFlete')" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2 transition">
+        <span>+ Registrar Flete</span>
+      </button>
+      <button
