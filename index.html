@@ -100,7 +100,7 @@
 
     <!-- Acciones Rápidas -->
     <div class="grid grid-cols-2 gap-3">
-      <button onclick="toggleModal('modalNuevoFlete')" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2 transition">
+      <button onclick="abrirModalNuevo()" class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2 transition">
         <span>+ Registrar Flete</span>
       </button>
       <button onclick="sincronizarGitHub()" class="w-full py-3 px-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 font-semibold text-sm rounded-xl border border-slate-700 flex items-center justify-center space-x-2 transition" id="btnSync">
@@ -110,8 +110,8 @@
 
     <!-- Historial de Operaciones -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
-      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Últimos Fletes Registrados</h2>
-      <div id="listaFletes" class="space-y-2.5 max-h-60 overflow-y-auto pr-1">
+      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Historial de Fletes</h2>
+      <div id="listaFletes" class="space-y-2.5 max-h-80 overflow-y-auto pr-1">
         <!-- Generado dinámicamente -->
       </div>
     </div>
@@ -125,7 +125,7 @@
         <h3 class="text-sm font-bold text-slate-100">Configurar Token GitHub</h3>
         <button onclick="toggleModal('modalToken')" class="text-slate-400 hover:text-slate-200">✕</button>
       </div>
-      <p class="text-xs text-slate-400 leading-relaxed">Pega aquí tu Personal Access Token generado en GitHub para permitir el guardado automático directo desde tu iPhone:</p>
+      <p class="text-xs text-slate-400 leading-relaxed">Pega aquí tu Personal Access Token de GitHub para permitir la sincronización automática:</p>
       
       <div>
         <label class="text-xs text-slate-400 block mb-1">GitHub Personal Token</label>
@@ -138,15 +138,17 @@
     </div>
   </div>
 
-  <!-- MODAL: Nuevo Flete -->
+  <!-- MODAL: Formulario Flete (Nuevo / Editar) -->
   <div id="modalNuevoFlete" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center hidden">
     <div class="bg-slate-900 border-t sm:border border-slate-800 w-full max-w-lg rounded-t-3xl sm:rounded-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto pb-safe">
       <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-        <h3 class="text-base font-bold text-slate-100">Registrar Nuevo Flete</h3>
+        <h3 class="text-base font-bold text-slate-100" id="modalTitulo">Registrar Nuevo Flete</h3>
         <button onclick="toggleModal('modalNuevoFlete')" class="text-slate-400 hover:text-slate-200 p-1">✕</button>
       </div>
 
       <form id="formFlete" onsubmit="guardarFlete(event)" class="space-y-3">
+        <input type="hidden" id="editIndex" value="-1">
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="text-xs text-slate-400 block mb-1">Fecha</label>
@@ -197,330 +199,3 @@
       </form>
     </div>
   </div>
-
-  <!-- MODAL: Widget Scriptable -->
-  <div id="modalScriptable" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-5 space-y-3 max-h-[85vh] flex flex-col">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-        <h3 class="text-sm font-bold text-slate-100">Código para Scriptable (iOS)</h3>
-        <button onclick="toggleModal('modalScriptable')" class="text-slate-400 hover:text-slate-200">✕</button>
-      </div>
-      <p class="text-xs text-slate-400">Copia este script y pégalo en la app <strong>Scriptable</strong> de tu iPhone:</p>
-      
-      <pre class="bg-slate-950 border border-slate-800 text-emerald-400 p-3 rounded-xl text-[11px] font-mono overflow-x-auto flex-1 select-all" id="codeScriptable"></pre>
-
-      <button onclick="copiarScriptable()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs rounded-xl transition">
-        Copiar Código al Portapapeles
-      </button>
-    </div>
-  </div>
-
-  <!-- LÓGICA JAVASCRIPT INTEGRADA CON GITHUB API -->
-  <script>
-    const OWNER = "gamring";
-    const REPO = "FLETES-GM";
-    const PATH = "flujo_caja.json";
-    const RAW_URL = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${PATH}`;
-    const API_URL = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${PATH}`;
-
-    let fletesData = [];
-    let fileSha = "";
-    let chartInstance = null;
-
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById('fecha').valueAsDate = new Date();
-      verificarTokenUI();
-      cargarDatosIniciales();
-      generarTextoScriptable();
-    });
-
-    function verificarTokenUI() {
-      let token = localStorage.getItem('gh_token_fletes');
-      let statusEl = document.getElementById('statusToken');
-      if (!token) {
-        statusEl.classList.remove('hidden');
-      } else {
-        statusEl.classList.add('hidden');
-        document.getElementById('inputToken').value = token;
-      }
-    }
-
-    function guardarToken() {
-      let token = document.getElementById('inputToken').value.trim();
-      if (token) {
-        localStorage.setItem('gh_token_fletes', token);
-        verificarTokenUI();
-        toggleModal('modalToken');
-        alert("¡Token guardado con éxito! Ahora puedes registrar fletes directamente.");
-        cargarDatosIniciales();
-      }
-    }
-
-    async function cargarDatosIniciales() {
-      let token = localStorage.getItem('gh_token_fletes');
-      try {
-        let headers = token ? { "Authorization": `token ${token}` } : {};
-        let res = await fetch(API_URL, { headers });
-        if (res.ok) {
-          let resJson = await res.json();
-          fileSha = resJson.sha;
-          let content = decodeURIComponent(escape(atob(resJson.content)));
-          fletesData = JSON.parse(content);
-          localStorage.setItem('fletes_gm_local', JSON.stringify(fletesData));
-        } else {
-          throw new Error();
-        }
-      } catch (e) {
-        let local = localStorage.getItem('fletes_gm_local');
-        fletesData = local ? JSON.parse(local) : [];
-      }
-      actualizarDashboard();
-    }
-
-    async function guardarFlete(e) {
-      e.preventDefault();
-      let btn = document.getElementById('btnGuardar');
-      btn.disabled = true;
-      btn.textContent = "Guardando en GitHub...";
-
-      let nuevoFlete = {
-        id: `FL-${String(fletesData.length + 1).padStart(3, '0')}`,
-        fecha: document.getElementById('fecha').value,
-        ingreso_flete: Number(document.getElementById('ingreso_flete').value || 0),
-        egresos: {
-          combustible: Number(document.getElementById('combustible').value || 0),
-          peajes: Number(document.getElementById('peajes').value || 0),
-          conductor: Number(document.getElementById('conductor').value || 0),
-          viaticos: Number(document.getElementById('viaticos').value || 0)
-        },
-        kilometros: Number(document.getElementById('kilometros').value || 0),
-        litros: Number(document.getElementById('litros').value || 0)
-      };
-
-      fletesData.push(nuevoFlete);
-
-      let exito = await sincronizarGitHub();
-      if (exito) {
-        toggleModal('modalNuevoFlete');
-        document.getElementById('formFlete').reset();
-        document.getElementById('fecha').valueAsDate = new Date();
-      }
-
-      btn.disabled = false;
-      btn.textContent = "Guardar Registro";
-    }
-
-    async function sincronizarGitHub() {
-      let token = localStorage.getItem('gh_token_fletes');
-      localStorage.setItem('fletes_gm_local', JSON.stringify(fletesData));
-      actualizarDashboard();
-
-      if (!token) {
-        alert("Registro guardado LOCALMENTE en tu iPhone. Para enviarlo a GitHub, configura tu Token en el icono de engranaje ⚙️.");
-        return false;
-      }
-
-      try {
-        let contentEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(fletesData, null, 2))));
-        let bodyData = {
-          message: "Actualización de flujo de caja desde iPhone",
-          content: contentEncoded
-        };
-        if (fileSha) bodyData.sha = fileSha;
-
-        let res = await fetch(API_URL, {
-          method: "PUT",
-          headers: {
-            "Authorization": `token ${token}`,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(bodyData)
-        });
-
-        if (res.ok) {
-          let resJson = await res.json();
-          fileSha = resJson.content.sha;
-          alert("¡Registro guardado y sincronizado con GitHub correctamente!");
-          return true;
-        } else {
-          alert("Error de permisos al guardar en GitHub. Revisa si tu Token expiró o no tiene permiso 'repo'.");
-          return false;
-        }
-      } catch (e) {
-        alert("Error de conexión al sincronizar con GitHub.");
-        return false;
-      }
-    }
-
-    function actualizarDashboard() {
-      let totalIngresos = 0, totalEgresos = 0, totalKm = 0, totalLitros = 0;
-      let comb = 0, peaj = 0, cond = 0, viat = 0;
-
-      fletesData.forEach(item => {
-        totalIngresos += Number(item.ingreso_flete || 0);
-        let eg = item.egresos || {};
-        comb += Number(eg.combustible || 0);
-        peaj += Number(eg.peajes || 0);
-        cond += Number(eg.conductor || 0);
-        viat += Number(eg.viaticos || 0);
-        totalKm += Number(item.kilometros || 0);
-        totalLitros += Number(item.litros || 0);
-      });
-
-      totalEgresos = comb + peaj + cond + viat;
-      let saldoNeto = totalIngresos - totalEgresos;
-      let cpk = totalKm > 0 ? (totalEgresos / totalKm) : 0;
-      let rendimiento = totalLitros > 0 ? (totalKm / totalLitros) : 0;
-
-      document.getElementById('kpiSaldoNeto').textContent = `$${saldoNeto.toLocaleString('es-CL')}`;
-      document.getElementById('kpiIngresos').textContent = `$${totalIngresos.toLocaleString('es-CL')}`;
-      document.getElementById('kpiEgresos').textContent = `$${totalEgresos.toLocaleString('es-CL')}`;
-      document.getElementById('kpiCpk').textContent = `$${Math.round(cpk).toLocaleString('es-CL')}`;
-      document.getElementById('kpiRendimiento').textContent = `${rendimiento.toFixed(1)} km/L`;
-
-      renderHistorial();
-      renderChart(comb, peaj, cond, viat, totalIngresos);
-    }
-
-    function renderHistorial() {
-      let container = document.getElementById('listaFletes');
-      container.innerHTML = '';
-
-      if (fletesData.length === 0) {
-        container.innerHTML = '<p class="text-xs text-slate-500 text-center py-4">No hay fletes registrados aún.</p>';
-        return;
-      }
-
-      [...fletesData].reverse().slice(0, 10).forEach(item => {
-        let eg = item.egresos || {};
-        let totalEg = Number(eg.combustible || 0) + Number(eg.peajes || 0) + Number(eg.conductor || 0) + Number(eg.viaticos || 0);
-        let neto = Number(item.ingreso_flete || 0) - totalEg;
-
-        let card = document.createElement('div');
-        card.className = "bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex justify-between items-center";
-        card.innerHTML = `
-          <div>
-            <div class="text-xs font-bold text-slate-200">${item.fecha} - ${item.id || 'Flete'}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">${item.kilometros || 0} km | Gastos: $${totalEg.toLocaleString('es-CL')}</div>
-          </div>
-          <div class="text-right">
-            <div class="text-xs font-bold text-emerald-400">+$${Number(item.ingreso_flete || 0).toLocaleString('es-CL')}</div>
-            <div class="text-[10px] ${neto >= 0 ? 'text-slate-400' : 'text-rose-400'}">Neto: $${neto.toLocaleString('es-CL')}</div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-    }
-
-    function renderChart(comb, peaj, cond, viat, ingresos) {
-      let ctx = document.getElementById('chartFlujo').getContext('2d');
-      if (chartInstance) chartInstance.destroy();
-
-      chartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Combustible', 'Peajes', 'Conductor', 'Viáticos', 'Margen Neto'],
-          datasets: [{
-            data: [comb, peaj, cond, viat, Math.max(0, ingresos - (comb + peaj + cond + viat))],
-            backgroundColor: ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#10b981'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'right',
-              labels: { color: '#94a3b8', font: { size: 10 } }
-            }
-          },
-          cutout: '70%'
-        }
-      });
-    }
-
-    function toggleModal(id) {
-      document.getElementById(id).classList.toggle('hidden');
-    }
-
-    function generarTextoScriptable() {
-      let scriptCode = `// Scriptable Widget para FLETES GM
-const DATA_URL = "${RAW_URL}";
-
-let req = new Request(DATA_URL);
-let data = await req.loadJSON();
-
-let totalIngresos = 0, totalEgresos = 0, totalKm = 0;
-
-data.forEach(item => {
-  totalIngresos += Number(item.ingreso_flete || 0);
-  let eg = item.egresos || {};
-  totalEgresos += Number(eg.combustible||0) + Number(eg.peajes||0) + Number(eg.conductor||0) + Number(eg.viaticos||0);
-  totalKm += Number(item.kilometros || 0);
-});
-
-let saldoNeto = totalIngresos - totalEgresos;
-let cpk = totalKm > 0 ? (totalEgresos / totalKm) : 0;
-
-let widget = new ListWidget();
-widget.backgroundColor = new Color("#0f172a");
-widget.setPadding(14, 14, 14, 14);
-
-let title = widget.addText("🚛 FLETES GM");
-title.textColor = new Color("#94a3b8");
-title.font = Font.boldSystemFont(11);
-
-widget.addSpacer(4);
-
-let lblSaldo = widget.addText("Saldo Neto");
-lblSaldo.textColor = new Color("#64748b");
-lblSaldo.font = Font.systemFont(9);
-
-let valSaldo = widget.addText(\`$\${saldoNeto.toLocaleString("es-CL")}\`);
-valSaldo.textColor = saldoNeto >= 0 ? new Color("#22c55e") : new Color("#ef4444");
-valSaldo.font = Font.boldSystemFont(18);
-
-widget.addSpacer(6);
-
-let stackBottom = widget.addStack();
-stackBottom.layoutHorizontally();
-
-let col1 = stackBottom.addStack();
-col1.layoutVertically();
-let lblCpk = col1.addText("Costo / km");
-lblCpk.textColor = new Color("#64748b");
-lblCpk.font = Font.systemFont(8);
-let valCpk = col1.addText(\`$\${Math.round(cpk)}\`);
-valCpk.textColor = new Color("#38bdf8");
-valCpk.font = Font.semiboldSystemFont(11);
-
-stackBottom.addSpacer();
-
-let col2 = stackBottom.addStack();
-col2.layoutVertically();
-let lblKm = col2.addText("Total Km");
-lblKm.textColor = new Color("#64748b");
-lblKm.font = Font.systemFont(8);
-let valKm = col2.addText(\`\${totalKm} km\`);
-valKm.textColor = new Color("#f1f5f9");
-valKm.font = Font.semiboldSystemFont(11);
-
-if (config.runsInWidget) {
-  Script.setWidget(widget);
-} else {
-  widget.presentSmall();
-}
-Script.complete();`;
-
-      document.getElementById('codeScriptable').textContent = scriptCode;
-    }
-
-    function copiarScriptable() {
-      let code = document.getElementById('codeScriptable').textContent;
-      navigator.clipboard.writeText(code);
-      alert('¡Código copiado! Pégalo en la app Scriptable de tu iPhone.');
-    }
-  </script>
-</body>
-</html>
