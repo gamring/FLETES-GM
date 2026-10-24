@@ -11,5 +11,16 @@
     },
     "kilometros": 480,
     "litros": 110
+  },
+  {
+    "id": "FL-0992",
+    "fecha": "2026-10-24",
+    "ingreso_flete": 0,
+    "egresos": {
+      "combustible": 30000,
+      "peajes": 0,
+      "conductor": 0,
+      "viaticos": 0
+    }
   }
 ]
