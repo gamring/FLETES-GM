@@ -25,7 +25,7 @@
 </head>
 <body class="h-full text-slate-100 font-sans antialiased flex flex-col justify-between">
 
-  <!-- Header iOS Style -->
+  <!-- Header -->
   <header class="bg-slate-900/80 backdrop-blur-md border-b border-slate-800 sticky top-0 z-50 pt-safe">
     <div class="px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-2">
@@ -48,7 +48,7 @@
     </div>
   </header>
 
-  <!-- Main Content Scrollable -->
+  <!-- Main Content -->
   <main class="flex-1 overflow-y-auto px-4 py-4 space-y-4">
     
     <div id="statusToken" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5 flex items-center justify-between text-xs text-amber-300">
@@ -56,39 +56,25 @@
       <button onclick="toggleModal('modalToken')" class="touch-btn underline font-bold ml-2">Configurar</button>
     </div>
 
-    <!-- KPIs -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="col-span-2 bg-gradient-to-br from-slate-900 to-slate-900/90 border border-slate-800 rounded-2xl p-4 shadow-xl">
-        <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Saldo Neto en Caja</span>
-        <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="kpiSaldoNeto">$0</div>
-        <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80 text-xs">
-          <span class="text-slate-400">Ingresos: <strong class="text-slate-200" id="kpiIngresos">$0</strong></span>
-          <span class="text-slate-400">Egresos: <strong class="text-slate-200" id="kpiEgresos">$0</strong></span>
-        </div>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md">
-        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Costo / km (CPK)</span>
-        <div class="text-xl font-bold text-sky-400 mt-0.5" id="kpiCpk">$0</div>
-        <span class="text-[10px] text-slate-500 mt-1 block">Promedio operación</span>
-      </div>
-
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-3.5 shadow-md">
-        <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Rendimiento</span>
-        <div class="text-xl font-bold text-indigo-400 mt-0.5" id="kpiRendimiento">0 km/L</div>
-        <span class="text-[10px] text-slate-500 mt-1 block">Eficiencia combustible</span>
+    <!-- KPI Saldo Neto -->
+    <div class="bg-gradient-to-br from-slate-900 to-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl">
+      <span class="text-xs font-medium text-slate-400 uppercase tracking-wider">Saldo Neto en Caja</span>
+      <div class="text-3xl font-extrabold text-emerald-400 mt-1" id="kpiSaldoNeto">$0</div>
+      <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/80 text-xs">
+        <span class="text-slate-400">Total Ingresos: <strong class="text-emerald-400" id="kpiIngresos">$0</strong></span>
+        <span class="text-slate-400">Total Egresos: <strong class="text-rose-400" id="kpiEgresos">$0</strong></span>
       </div>
     </div>
 
     <!-- Gráfico -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
-      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Distribución Egresos vs Ingresos</h2>
+      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Distribución de Egresos vs Margen</h2>
       <div class="h-48 relative">
         <canvas id="chartFlujo"></canvas>
       </div>
     </div>
 
-    <!-- Acciones Rápidas -->
+    <!-- Acciones -->
     <div class="grid grid-cols-2 gap-3">
       <button onclick="abrirModalNuevo()" class="touch-btn w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 font-semibold text-sm rounded-xl shadow-lg shadow-indigo-600/20 flex items-center justify-center space-x-2 transition">
         <span>+ Registrar Flete</span>
@@ -98,11 +84,11 @@
       </button>
     </div>
 
-    <!-- Historial de Operaciones -->
+    <!-- Historial Independiente -->
     <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-md">
-      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Historial de Fletes</h2>
+      <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">Fletes Registrados</h2>
       <div id="listaFletes" class="space-y-3 max-h-96 overflow-y-auto pr-1">
-        <!-- Tarjetas dinámicas touch -->
+        <!-- Lista de tarjetas individuales -->
       </div>
     </div>
 
@@ -169,17 +155,6 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3 border-t border-slate-800 pt-3">
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">Kilómetros Recorridos</label>
-            <input type="number" id="kilometros" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">Litros Cargados</label>
-            <input type="number" id="litros" placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500">
-          </div>
-        </div>
-
         <button type="submit" id="btnGuardar" class="touch-btn w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-600/30 mt-2 transition">
           Guardar Registro
         </button>
@@ -201,7 +176,6 @@
     </div>
   </div>
 
-  <!-- LÓGICA JAVASCRIPT TOUCH-OPTIMIZED -->
   <script>
     const OWNER = "gamring";
     const REPO = "FLETES-GM";
@@ -276,15 +250,13 @@
       let eg = item.egresos || {};
 
       document.getElementById('editIndex').value = index;
-      document.getElementById('modalTitulo').textContent = `Editar ${item.id || 'Flete'}`;
+      document.getElementById('modalTitulo').textContent = `Editar Flete (${item.id || 'Nº ' + (index+1)})`;
       document.getElementById('fecha').value = item.fecha || '';
       document.getElementById('ingreso_flete').value = item.ingreso_flete || 0;
       document.getElementById('combustible').value = eg.combustible || 0;
       document.getElementById('peajes').value = eg.peajes || 0;
       document.getElementById('conductor').value = eg.conductor || 0;
       document.getElementById('viaticos').value = eg.viaticos || 0;
-      document.getElementById('kilometros').value = item.kilometros || 0;
-      document.getElementById('litros').value = item.litros || 0;
 
       toggleModal('modalNuevoFlete');
     }
@@ -306,7 +278,7 @@
       let editIdx = parseInt(document.getElementById('editIndex').value);
 
       let registro = {
-        id: editIdx >= 0 ? fletesData[editIdx].id : `FL-${String(fletesData.length + 1).padStart(3, '0')}`,
+        id: editIdx >= 0 ? fletesData[editIdx].id : `FL-${Date.now().toString().slice(-4)}`,
         fecha: document.getElementById('fecha').value,
         ingreso_flete: Number(document.getElementById('ingreso_flete').value || 0),
         egresos: {
@@ -314,9 +286,7 @@
           peajes: Number(document.getElementById('peajes').value || 0),
           conductor: Number(document.getElementById('conductor').value || 0),
           viaticos: Number(document.getElementById('viaticos').value || 0)
-        },
-        kilometros: Number(document.getElementById('kilometros').value || 0),
-        litros: Number(document.getElementById('litros').value || 0)
+        }
       };
 
       if (editIdx >= 0) {
@@ -377,7 +347,7 @@
     }
 
     function actualizarDashboard() {
-      let totalIngresos = 0, totalEgresos = 0, totalKm = 0, totalLitros = 0;
+      let totalIngresos = 0, totalEgresos = 0;
       let comb = 0, peaj = 0, cond = 0, viat = 0;
 
       fletesData.forEach(item => {
@@ -387,20 +357,14 @@
         peaj += Number(eg.peajes || 0);
         cond += Number(eg.conductor || 0);
         viat += Number(eg.viaticos || 0);
-        totalKm += Number(item.kilometros || 0);
-        totalLitros += Number(item.litros || 0);
       });
 
       totalEgresos = comb + peaj + cond + viat;
       let saldoNeto = totalIngresos - totalEgresos;
-      let cpk = totalKm > 0 ? (totalEgresos / totalKm) : 0;
-      let rendimiento = totalLitros > 0 ? (totalKm / totalLitros) : 0;
 
       document.getElementById('kpiSaldoNeto').textContent = `$${saldoNeto.toLocaleString('es-CL')}`;
       document.getElementById('kpiIngresos').textContent = `$${totalIngresos.toLocaleString('es-CL')}`;
       document.getElementById('kpiEgresos').textContent = `$${totalEgresos.toLocaleString('es-CL')}`;
-      document.getElementById('kpiCpk').textContent = `$${Math.round(cpk).toLocaleString('es-CL')}`;
-      document.getElementById('kpiRendimiento').textContent = `${rendimiento.toFixed(1)} km/L`;
 
       renderHistorial();
       renderChart(comb, peaj, cond, viat, totalIngresos);
@@ -417,30 +381,42 @@
 
       fletesData.forEach((item, index) => {
         let eg = item.egresos || {};
-        let totalEg = Number(eg.combustible || 0) + Number(eg.peajes || 0) + Number(eg.conductor || 0) + Number(eg.viaticos || 0);
-        let neto = Number(item.ingreso_flete || 0) - totalEg;
+        let comb = Number(eg.combustible || 0);
+        let peaj = Number(eg.peajes || 0);
+        let cond = Number(eg.conductor || 0);
+        let viat = Number(eg.viaticos || 0);
+        let totalEg = comb + peaj + cond + viat;
+        let ingreso = Number(item.ingreso_flete || 0);
+        let neto = ingreso - totalEg;
 
         let card = document.createElement('div');
-        card.className = "bg-slate-950 border border-slate-800/80 rounded-xl p-3 flex justify-between items-center";
+        card.className = "bg-slate-950 border border-slate-800/80 rounded-xl p-3.5 space-y-2.5";
         
         card.innerHTML = `
-          <div class="flex-1 pr-2">
-            <div class="text-xs font-bold text-slate-200">${item.fecha} - ${item.id || 'Flete'}</div>
-            <div class="text-[10px] text-slate-400 mt-0.5">${item.kilometros || 0} km | Gastos: $${totalEg.toLocaleString('es-CL')}</div>
+          <div class="flex justify-between items-center border-b border-slate-800/60 pb-2">
+            <div>
+              <div class="text-xs font-bold text-slate-200">${item.fecha} — ${item.id || 'Flete'}</div>
+              <div class="text-[10px] text-emerald-400 font-semibold mt-0.5">Ingreso Flete: +$${ingreso.toLocaleString('es-CL')}</div>
+            </div>
+            <div class="flex items-center space-x-1">
+              <button data-action="edit" data-index="${index}" class="touch-btn bg-slate-800 active:bg-sky-600 px-2.5 py-1.5 rounded-lg text-sky-400 active:text-white font-bold text-xs">✏️</button>
+              <button data-action="delete" data-index="${index}" class="touch-btn bg-slate-800 active:bg-rose-600 px-2.5 py-1.5 rounded-lg text-rose-400 active:text-white font-bold text-xs">🗑️</button>
+            </div>
           </div>
-          <div class="flex items-center space-x-2">
-            <div class="text-right">
-              <div class="text-xs font-bold text-emerald-400">+$${Number(item.ingreso_flete || 0).toLocaleString('es-CL')}</div>
-              <div class="text-[10px] ${neto >= 0 ? 'text-slate-400' : 'text-rose-400'}">Neto: $${neto.toLocaleString('es-CL')}</div>
-            </div>
-            <div class="flex items-center space-x-1 pl-2 border-l border-slate-800">
-              <button data-action="edit" data-index="${index}" class="touch-btn bg-slate-800 active:bg-sky-600 px-3 py-2 rounded-lg text-sky-400 active:text-white font-bold text-xs" title="Editar">✏️</button>
-              <button data-action="delete" data-index="${index}" class="touch-btn bg-slate-800 active:bg-rose-600 px-3 py-2 rounded-lg text-rose-400 active:text-white font-bold text-xs" title="Eliminar">🗑️</button>
-            </div>
+
+          <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-400 bg-slate-900/40 p-2 rounded-lg border border-slate-800/40">
+            <div>Combustible: <strong class="text-slate-200">$${comb.toLocaleString('es-CL')}</strong></div>
+            <div>Peajes: <strong class="text-slate-200">$${peaj.toLocaleString('es-CL')}</strong></div>
+            <div>Conductor: <strong class="text-slate-200">$${cond.toLocaleString('es-CL')}</strong></div>
+            <div>Viáticos: <strong class="text-slate-200">$${viat.toLocaleString('es-CL')}</strong></div>
+          </div>
+
+          <div class="flex justify-between items-center pt-0.5 text-xs">
+            <span class="text-slate-400">Total Egresos: <strong class="text-rose-400">-$${totalEg.toLocaleString('es-CL')}</strong></span>
+            <span class="font-bold ${neto >= 0 ? 'text-emerald-400' : 'text-rose-400'}">Neto: $${neto.toLocaleString('es-CL')}</span>
           </div>
         `;
 
-        // Delegación de eventos Táctiles para iOS Safari
         card.querySelectorAll('button').forEach(btn => {
           let handleTouch = (e) => {
             e.preventDefault();
@@ -496,17 +472,15 @@ const DATA_URL = "${RAW_URL}";
 let req = new Request(DATA_URL);
 let data = await req.loadJSON();
 
-let totalIngresos = 0, totalEgresos = 0, totalKm = 0;
+let totalIngresos = 0, totalEgresos = 0;
 
 data.forEach(item => {
   totalIngresos += Number(item.ingreso_flete || 0);
   let eg = item.egresos || {};
   totalEgresos += Number(eg.combustible||0) + Number(eg.peajes||0) + Number(eg.conductor||0) + Number(eg.viaticos||0);
-  totalKm += Number(item.kilometros || 0);
 });
 
 let saldoNeto = totalIngresos - totalEgresos;
-let cpk = totalKm > 0 ? (totalEgresos / totalKm) : 0;
 
 let widget = new ListWidget();
 widget.backgroundColor = new Color("#0f172a");
@@ -516,40 +490,40 @@ let title = widget.addText("🚛 FLETES GM");
 title.textColor = new Color("#94a3b8");
 title.font = Font.boldSystemFont(11);
 
-widget.addSpacer(4);
+widget.addSpacer(6);
 
-let lblSaldo = widget.addText("Saldo Neto");
+let lblSaldo = widget.addText("Saldo Neto en Caja");
 lblSaldo.textColor = new Color("#64748b");
-lblSaldo.font = Font.systemFont(9);
+lblSaldo.font = Font.systemFont(10);
 
 let valSaldo = widget.addText(\`$\${saldoNeto.toLocaleString("es-CL")}\`);
 valSaldo.textColor = saldoNeto >= 0 ? new Color("#22c55e") : new Color("#ef4444");
-valSaldo.font = Font.boldSystemFont(18);
+valSaldo.font = Font.boldSystemFont(20);
 
-widget.addSpacer(6);
+widget.addSpacer(8);
 
 let stackBottom = widget.addStack();
 stackBottom.layoutHorizontally();
 
 let col1 = stackBottom.addStack();
 col1.layoutVertically();
-let lblCpk = col1.addText("Costo / km");
-lblCpk.textColor = new Color("#64748b");
-lblCpk.font = Font.systemFont(8);
-let valCpk = col1.addText(\`$\${Math.round(cpk)}\`);
-valCpk.textColor = new Color("#38bdf8");
-valCpk.font = Font.semiboldSystemFont(11);
+let lblIng = col1.addText("Ingresos");
+lblIng.textColor = new Color("#64748b");
+lblIng.font = Font.systemFont(8);
+let valIng = col1.addText(\`$\${totalIngresos.toLocaleString("es-CL")}\`);
+valIng.textColor = new Color("#10b981");
+valIng.font = Font.semiboldSystemFont(10);
 
 stackBottom.addSpacer();
 
 let col2 = stackBottom.addStack();
 col2.layoutVertically();
-let lblKm = col2.addText("Total Km");
-lblKm.textColor = new Color("#64748b");
-lblKm.font = Font.systemFont(8);
-let valKm = col2.addText(\`\${totalKm} km\`);
-valKm.textColor = new Color("#f1f5f9");
-valKm.font = Font.semiboldSystemFont(11);
+let lblEgr = col2.addText("Egresos");
+lblEgr.textColor = new Color("#64748b");
+lblEgr.font = Font.systemFont(8);
+let valEgr = col2.addText(\`$\${totalEgresos.toLocaleString("es-CL")}\`);
+valEgr.textColor = new Color("#ef4444");
+valEgr.font = Font.semiboldSystemFont(10);
 
 if (config.runsInWidget) {
   Script.setWidget(widget);
