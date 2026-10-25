@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "id": "FL-9235",
+    "fecha": "2026-10-25",
+    "ingreso_flete": 170000,
+    "egresos": {
+      "combustible": 70000,
+      "peajes": 10000,
+      "conductor": 0,
+      "viaticos": 10000
+    }
+  }
+]
