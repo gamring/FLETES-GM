@@ -9,5 +9,16 @@
       "conductor": 0,
       "viaticos": 10000
     }
+  },
+  {
+    "id": "FL-0552",
+    "fecha": "2026-10-25",
+    "ingreso_flete": 200000,
+    "egresos": {
+      "combustible": 70000,
+      "peajes": 10000,
+      "conductor": 0,
+      "viaticos": 15000
+    }
   }
 ]
