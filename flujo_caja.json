@@ -1,15 +1,1 @@
-[
-  {
-    "id": "FL-001",
-    "fecha": "2026-10-23",
-    "ingreso_flete": 450000,
-    "egresos": {
-      "combustible": 120000,
-      "peajes": 35000,
-      "conductor": 80000,
-      "viaticos": 25000
-    },
-    "kilometros": 480,
-    "litros": 110
-  }
-]
+[]
