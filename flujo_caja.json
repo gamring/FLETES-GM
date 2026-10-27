@@ -20,16 +20,5 @@
       "conductor": 0,
       "viaticos": 15000
     }
-  },
-  {
-    "id": "FL-4870",
-    "fecha": "2026-10-27",
-    "ingreso_flete": 200000,
-    "egresos": {
-      "combustible": 80000,
-      "peajes": 5000,
-      "conductor": 20000,
-      "viaticos": 10000
-    }
   }
 ]
