@@ -24,7 +24,7 @@
   {
     "id": "FL-4870",
     "fecha": "2026-10-27",
-    "ingreso_flete": 20000,
+    "ingreso_flete": 200000,
     "egresos": {
       "combustible": 80000,
       "peajes": 5000,
